@@ -1,0 +1,40 @@
+---
+title: "identify missing ICD codes"
+author: "Dominick Lemas"
+date: "2025-07-28"
+output: html_document
+---
+
+```{r}
+
+library (tidyselect)
+library (dplyr)
+
+# working-directory
+work_dir="C:/Users/djlemas/Documents/GitHub/onboarding/"
+
+# import data
+smm_codes_oneflorida <- read_csv(paste0(work_dir,"data/task/task_02_2025/smm_codes_oneflorida.csv"))
+smm_codes_we_have <- read_csv(paste0(work_dir,"data/task/task_02_2025/smm_codes_we_have.csv"))
+
+# find the intersection of the code sets
+length(intersect(smm_codes_oneflorida$icd_decimal,smm_codes_we_have$diagnosis_code))
+
+# create a flag in "smm_codes_we_have" that marks if the code is also present in "smm_codes_oneflorida"
+smm_codes_we_have_ready=smm_codes_we_have %>%
+  mutate(overlap_1FL=if_else(smm_codes_we_have$diagnosis_code %in% smm_codes_oneflorida$icd_decimal, 1, 0))
+# create dynamic filename with current date
+output_file = paste0(work_dir, "data/task/task_02_2025/smm_codes_we_have_ready_", Sys.Date(), ".csv")
+# write the updated data frame to file
+write_csv(smm_codes_we_have_ready, output_file)
+
+# create a flag in "smm_codes_oneflorida" that marks if the code is also present in "smm_codes_we_have"
+smm_codes_oneflorida_ready=smm_codes_oneflorida %>%
+  mutate(overlap_ufhealth=if_else(smm_codes_oneflorida$icd_decimal %in% smm_codes_we_have$diagnosis_code, 1, 0))
+# create dynamic filename with current date
+output_file = paste0(work_dir, "data/task/task_02_2025/smm_codes_oneflorida_ready_", Sys.Date(), ".csv")
+# write the updated data frame to file
+write_csv(smm_codes_oneflorida_ready, output_file)
+
+```
+
